@@ -186,8 +186,8 @@
         <span id="selectedRecipientName">Максим</span>
       </div>
 
-      <!-- Блок выбора суммы (скрывается для Максима) -->
-      <div id="amountBlock">
+      <!-- Блок выбора суммы (скрыт по умолчанию) -->
+      <div id="amountBlock" style="display: none;">
         <p>Выберите сумму пожертвования для <strong id="recipientNameInline">Максима</strong>:</p>
 
         <div class="amount-options" id="amountOptions">
@@ -202,14 +202,14 @@
         </div>
       </div>
 
-      <!-- Блок реквизитов (показывается для Максима) -->
-      <div class="sбп-block" id="requisitesBlock">
+      <!-- Блок реквизитов (скрыт по умолчанию) -->
+      <div class="sбп-block" id="requisitesBlock" style="display: none;">
         <p>📱 Реквизиты получателя</p>
         <div class="sбп-details">
-          <span id="sbpPhone">+7 918 868 87 00</span> — телефон
+          <span id="sbpPhone"></span> — телефон
         </div>
         <div class="sбп-details">
-          <span id="sbpCard">2200 7012 1846 7451</span> — карта
+          <span id="sbpCard"></span> — карта
         </div>
 
         <div class="sбп-note" id="sbpNote">
@@ -217,14 +217,14 @@
         </div>
       </div>
 
-      <!-- Блок «нет реквизитов» (для Вани и Димы) -->
-      <div class="no-requisites hidden" id="noRequisitesBlock">
+      <!-- Блок «нет реквизитов» (скрыт по умолчанию) -->
+      <div class="no-requisites" id="noRequisitesBlock" style="display: none;">
         💳 Реквизиты для оплаты не указаны.<br>
         Свяжитесь с родителями, чтобы получить способ перевода.
       </div>
 
-      <!-- Кнопка перевода (скрывается для Максима) -->
-      <button class="btn-pay" id="payBtn">Перевести через СБП</button>
+      <!-- Кнопка перевода (скрыта по умолчанию) -->
+      <button class="btn-pay" id="payBtn" style="display: none;">Перевести через СБП</button>
     </div>
   </div>
 </div>
@@ -412,20 +412,30 @@
   const closeModalBtn2 = document.getElementById('closeModalBtn2');
   const selectedRecipientBox = document.getElementById('selectedRecipientBox');
   const selectedRecipientName = document.getElementById('selectedRecipientName');
-  const recipientNameInline = document.getElementById('recipientNameInline');
   
   const amountBlock = document.getElementById('amountBlock');
   const requisitesBlock = document.getElementById('requisitesBlock');
   const noRequisitesBlock = document.getElementById('noRequisitesBlock');
   const payBtn = document.getElementById('payBtn');
 
-  const amountBtns = document.querySelectorAll('.amount-btn');
-  const customInput = document.getElementById('customAmountInput');
-
   const recipientsData = {
-    maxim: { name: 'Максим', avatar: '🧑‍🎓', phone: '+7 918 868 87 00', card: '2200 7012 1846 7451', mode: 'requisites_only' },
-    vanya: { name: 'Ваня', avatar: '🧒', mode: 'no_requisites' },
-    dima: { name: 'Дима', avatar: '👦', mode: 'no_requisites' }
+    maxim: { 
+      name: 'Максим', 
+      avatar: '🧑‍🎓', 
+      phone: '+7 918 868 87 00', 
+      card: '2200 7012 1846 7451', 
+      mode: 'requisites_only' // Только реквизиты
+    },
+    vanya: { 
+      name: 'Ваня', 
+      avatar: '🧒', 
+      mode: 'no_requisites' // Нет реквизитов
+    },
+    dima: { 
+      name: 'Дима', 
+      avatar: '👦', 
+      mode: 'no_requisites' // Нет реквизитов
+    }
   };
 
   function closeModal() { modal.classList.remove('active'); }
@@ -436,27 +446,25 @@
     const data = recipientsData[childId];
     if (!data) return;
 
+    // Сброс всех блоков в скрытое состояние
+    amountBlock.style.display = 'none';
+    requisitesBlock.style.display = 'none';
+    noRequisitesBlock.style.display = 'none';
+    payBtn.style.display = 'none';
+
     selectedRecipientBox.querySelector('.r-avatar').textContent = data.avatar;
     selectedRecipientName.textContent = data.name;
 
     if (data.mode === 'requisites_only') {
-      // Максим: только реквизиты, без выбора суммы и кнопки перевода
-      amountBlock.classList.add('hidden');
-      payBtn.classList.add('hidden');
-      noRequisitesBlock.classList.add('hidden');
-      
-      requisitesBlock.classList.remove('hidden');
+      // Максим: показываем ТОЛЬКО реквизиты
+      requisitesBlock.style.display = 'block';
       document.getElementById('sbpPhone').textContent = data.phone;
       document.getElementById('sbpCard').textContent = data.card;
       document.getElementById('sbpNote').textContent = 'Переведите по телефону или номеру карты (получатель: ' + data.name + ')';
       
     } else if (data.mode === 'no_requisites') {
-      // Ваня и Дима: нет реквизитов
-      amountBlock.classList.add('hidden');
-      payBtn.classList.add('hidden');
-      requisitesBlock.classList.add('hidden');
-      
-      noRequisitesBlock.classList.remove('hidden');
+      // Ваня и Дима: показываем сообщение об отсутствии реквизитов
+      noRequisitesBlock.style.display = 'block';
     }
     
     modal.classList.add('active');

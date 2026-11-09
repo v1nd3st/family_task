@@ -8,8 +8,33 @@
     * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
     body { background: linear-gradient(145deg, #f6f9fc 0%, #e9f0f7 100%); min-height: 100vh; padding: 1.5rem 1rem 3rem; display: flex; flex-direction: column; align-items: center; }
     .app { max-width: 1100px; width: 100%; }
-    h1 { font-size: 2.1rem; font-weight: 700; color: #1e3c5c; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    h1 { font-size: 2.1rem; font-weight: 700; color: #1e3c5c; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
     h1 span { background: #d0e2f2; border-radius: 60px; font-size: 1rem; padding: 0.2rem 1rem; font-weight: 500; color: #1e3c5c; }
+    
+    .current-date-badge {
+      background: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #1e3c5c;
+      box-shadow: 0 4px 15px rgba(0, 30, 50, 0.05);
+      border: 1px solid #d0e2f2;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
     .child-card { background: white; border-radius: 30px; padding: 1.5rem 1.2rem 1.8rem; box-shadow: 0 12px 30px rgba(0, 30, 50, 0.1); transition: transform 0.15s ease, box-shadow 0.2s; border: 1px solid #ffffff70; backdrop-filter: blur(2px); display: flex; flex-direction: column; }
     .child-card:hover { transform: translateY(-3px); box-shadow: 0 20px 35px rgba(0, 40, 70, 0.15); }
@@ -37,11 +62,10 @@
 
     .delete-extra { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #b04b4b; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; transition: 0.15s; opacity: 0.6; flex-shrink: 0; }
     .delete-extra:hover { background: #ffd7d7; opacity: 1; }
-    .task-counter { font-size: 0.8rem; color: #376e99; font-weight: 600; text-align: right; margin-bottom: 0.2rem; }
-    .task-counter.limit-reached { color: #b04b4b; }
+    
     .btn-add { background: transparent; border: 2px dashed #7ba7c9; color: #1e4a6e; font-weight: 600; padding: 0.5rem 1rem; border-radius: 40px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; margin-top: 0.8rem; margin-bottom: 0; cursor: pointer; transition: background 0.15s, border 0.15s; }
     .btn-add:hover:not(:disabled) { background: #dbeafe; border: 2px dashed #376e99; }
-    .btn-add:disabled { cursor: not-allowed; opacity: 0.55; border-color: #c4d4e2; color: #7d9bb3; background: #f3f8fc; }
+    
     .btn-reward-child { background: #e6b12e; color: #1f2e3c; border: none; font-weight: 700; font-size: 1rem; padding: 0.8rem 1rem; border-radius: 60px; cursor: pointer; box-shadow: 0 8px 18px #e6b12e55; transition: 0.15s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; margin-top: 10px; padding-top: 0.8rem; }
     .btn-reward-child:hover { background: #f0bb3a; transform: scale(1.01); }
     
@@ -87,7 +111,12 @@
 </head>
 <body>
 <div class="app">
-  <h1>🏠 Семейный штаб <span>Максим · Ваня · Дима</span></h1>
+  <div class="top-bar">
+    <h1>🏠 Семейный штаб <span>Максим · Ваня · Дима</span></h1>
+    <div class="current-date-badge" id="topDateBadge">
+      <!-- Сюда вставится дата через скрипт -->
+    </div>
+  </div>
 
   <div class="cards-grid" id="childrenGrid">
     <!-- Максим -->
@@ -118,7 +147,6 @@
         </ul>
       </div>
       <div class="extra-tasks" id="extra-maxim"></div>
-      <div class="task-counter" id="counter-maxim">0 / 3</div>
       <button class="btn-add" data-child="maxim">➕ Добавить задание</button>
       <button class="btn-reward-child" data-child="maxim">💰 Вознаграждение</button>
     </div>
@@ -150,7 +178,6 @@
         </ul>
       </div>
       <div class="extra-tasks" id="extra-vanya"></div>
-      <div class="task-counter" id="counter-vanya">0 / 3</div>
       <button class="btn-add" data-child="vanya">➕ Добавить задание</button>
       <button class="btn-reward-child" data-child="vanya">💰 Вознаграждение</button>
     </div>
@@ -182,7 +209,6 @@
         </ul>
       </div>
       <div class="extra-tasks" id="extra-dima"></div>
-      <div class="task-counter" id="counter-dima">0 / 3</div>
       <button class="btn-add" data-child="dima">➕ Добавить задание</button>
       <button class="btn-reward-child" data-child="dima">💰 Вознаграждение</button>
     </div>
@@ -271,10 +297,24 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+  // 0. Установка текущей даты наверх
+  function updateTopDate() {
+    const badge = document.getElementById('topDateBadge');
+    const now = new Date();
+    const months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+    const days = ['(Вск)', '(Пон)', '(Втр)', '(Срд)', '(Чтв)', '(Птн)', '(Сбт)'];
+    
+    const day = now.getDate();
+    const month = months[now.getMonth()];
+    const dayOfWeek = days[now.getDay()];
+    
+    badge.textContent = `📅 ${day} ${month} ${dayOfWeek}`;
+  }
+  updateTopDate();
+
   const syncStatus = document.getElementById('syncStatus');
   let db = null;
   let extraTasks = { maxim: [], vanya: [], dima: [] };
-  const TASK_LIMIT = 3;
 
   // ============================================
   // ВАШИ КЛЮЧИ FIREBASE
@@ -341,11 +381,6 @@
     vanya: document.getElementById('extra-vanya'),
     dima: document.getElementById('extra-dima')
   };
-  const counters = {
-    maxim: document.getElementById('counter-maxim'),
-    vanya: document.getElementById('counter-vanya'),
-    dima: document.getElementById('counter-dima')
-  };
 
   function escapeHtml(text) {
     const div = document.createElement('div');
@@ -365,25 +400,6 @@
     const date = new Date(dateStr);
     const days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
     return days[date.getDay()];
-  }
-
-  function updateCounterAndButtons(childId) {
-    const count = extraTasks[childId].length;
-    const counterEl = counters[childId];
-    if (counterEl) {
-      counterEl.textContent = count + ' / ' + TASK_LIMIT;
-      counterEl.classList.toggle('limit-reached', count >= TASK_LIMIT);
-    }
-    const addBtn = document.querySelector('.btn-add[data-child="' + childId + '"]');
-    if (addBtn) {
-      if (count >= TASK_LIMIT) {
-        addBtn.disabled = true;
-        addBtn.textContent = '🚫 Лимит заданий (' + count + '/' + TASK_LIMIT + ')';
-      } else {
-        addBtn.disabled = false;
-        addBtn.textContent = '➕ Добавить задание';
-      }
-    }
   }
 
   function renderExtraTasks(childId) {
@@ -424,7 +440,6 @@
       `;
       container.appendChild(div);
     });
-    updateCounterAndButtons(childId);
   }
 
   // Модалка добавления
@@ -456,11 +471,6 @@
       const childId = btn.dataset.child;
       if (!childId) return;
       
-      if (extraTasks[childId].length >= TASK_LIMIT) {
-        alert('Достигнут лимит заданий.');
-        return;
-      }
-
       taskChildIdInput.value = childId;
       taskTextInput.value = '';
       taskDateInput.value = new Date().toISOString().split('T')[0]; // Сегодня по умолчанию

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Семейные задания: Максим, Ваня, Дима</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+    body { background: linear-gradient(145deg, #f6f9fc 0%, #e9f0f7 100%); min-height: 100vh; padding: 1.5rem 1rem 3rem; display: flex; flex-direction: column; align-items: center; }
+    .app { max-width: 1100px; width: 100%; }
+    h1 { font-size: 2.1rem; font-weight: 700; color: #1e3c5c; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    h1 span { background: #d0e2f2; border-radius: 60px; font-size: 1rem; padding: 0.2rem 1rem; font-weight: 500; color: #1e3c5c; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .child-card { background: white; border-radius: 30px; padding: 1.5rem 1.2rem 1.8rem; box-shadow: 0 12px 30px rgba(0, 30, 50, 0.1); transition: transform 0.15s ease, box-shadow 0.2s; border: 1px solid #ffffff70; backdrop-filter: blur(2px); display: flex; flex-direction: column; }
+    .child-card:hover { transform: translateY(-3px); box-shadow: 0 20px 35px rgba(0, 40, 70, 0.15); }
+    .child-header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; }
+    .avatar { font-size: 2.2rem; background: #e2edf7; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .child-name { font-size: 1.8rem; font-weight: 700; color: #153e5c; letter-spacing: -0.5px; }
+    .task-section { margin-bottom: 1.3rem; }
+    .task-section h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px; color: #376e99; font-weight: 600; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem; }
+    .task-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+    .task-item { background: #f4f9ff; padding: 0.6rem 1rem; border-radius: 18px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #588bb3; font-size: 0.95rem; }
+    .task-day { font-weight: 600; color: #16456b; background: #d9e7f4; padding: 0.2rem 0.7rem; border-radius: 40px; font-size: 0.75rem; text-transform: uppercase; }
+    .badge-daily { background: #b8d9fb; color: #16456b; font-weight: 500; font-size: 0.75rem; padding: 0.2rem 0.7rem; border-radius: 20px; }
+    .extra-tasks { margin-top: 0.5rem; }
+    .extra-task { background: #fff6e0; border-left-color: #e6b12e; display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; border-radius: 16px; font-size: 0.92rem; border-left: 4px solid #e6b12e; margin-bottom: 0.4rem; gap: 0.5rem; }
+    .delete-extra { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #b04b4b; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; transition: 0.15s; opacity: 0.6; }
+    .delete-extra:hover { background: #ffd7d7; opacity: 1; }
+    .task-counter { font-size: 0.8rem; color: #376e99; font-weight: 600; text-align: right; margin-bottom: 0.2rem; }
+    .task-counter.limit-reached { color: #b04b4b; }
+    .btn-add { background: transparent; border: 2px dashed #7ba7c9; color: #1e4a6e; font-weight: 600; padding: 0.5rem 1rem; border-radius: 40px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; margin-top: 0.8rem; margin-bottom: 0; cursor: pointer; transition: background 0.15s, border 0.15s; }
+    .btn-add:hover:not(:disabled) { background: #dbeafe; border: 2px dashed #376e99; }
+    .btn-add:disabled { cursor: not-allowed; opacity: 0.55; border-color: #c4d4e2; color: #7d9bb3; background: #f3f8fc; }
+    .btn-reward-child { background: #e6b12e; color: #1f2e3c; border: none; font-weight: 700; font-size: 1rem; padding: 0.8rem 1rem; border-radius: 60px; cursor: pointer; box-shadow: 0 8px 18px #e6b12e55; transition: 0.15s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; margin-top: 10px; padding-top: 0.8rem; }
+    .btn-reward-child:hover { background: #f0bb3a; transform: scale(1.01); }
+    .action-buttons { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 0.5rem 0 2rem; }
+    .btn-primary { background: #1e3c5c; color: white; border: none; font-weight: 600; font-size: 1.1rem; padding: 0.9rem 2.2rem; border-radius: 60px; cursor: pointer; box-shadow: 0 10px 20px rgba(20, 60, 100, 0.25); transition: 0.15s; display: inline-flex; align-items: center; gap: 0.6rem; letter-spacing: 0.3px; }
+    .btn-primary:hover { background: #254e73; transform: scale(1.01); box-shadow: 0 12px 24px rgba(20, 60, 100, 0.35); }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 25, 40, 0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; visibility: hidden; opacity: 0; transition: opacity 0.2s, visibility 0.2s; }
+    .modal-overlay.active { visibility: visible; opacity: 1; }
+    .modal { background: white; max-width: 480px; width: 100%; border-radius: 40px; padding: 2rem 1.8rem 2rem; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4); position: relative; animation: modalIn 0.25s; max-height: 92vh; overflow-y: auto; }
+    @keyframes modalIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal h2 { font-size: 1.8rem; color: #1e3c5c; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .modal h2 .title-text { font-size: 1.5rem; }
+    .modal-close { background: none; border: none; font-size: 2rem; cursor: pointer; color: #7d9bb3; line-height: 1; padding: 0 0.5rem; }
+    .modal p { color: #3b5f7a; margin-bottom: 1.8rem; font-size: 1.05rem; }
+    .modal-step { display: none; }
+    .modal-step.active { display: block; }
+    .selected-recipient { display: flex; align-items: center; gap: 0.7rem; background: #eef5fc; border-radius: 20px; padding: 0.7rem 1rem; margin-bottom: 1.2rem; font-weight: 600; color: #1e3c5c; }
+    .selected-recipient .r-avatar { font-size: 1.5rem; }
+    .amount-options { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.8rem; }
+    .amount-btn { flex: 1 0 calc(33% - 0.8rem); background: #f1f7fd; border: 2px solid transparent; border-radius: 40px; padding: 0.8rem 0.2rem; font-weight: 600; font-size: 1rem; color: #1e3c5c; cursor: pointer; transition: 0.1s; }
+    .amount-btn.selected { background: #1e3c5c; color: white; border-color: #1e3c5c; }
+    .amount-btn:hover { border-color: #1e3c5c; }
+    .custom-amount { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.8rem; }
+    .custom-amount input { flex: 1; padding: 0.9rem 1.2rem; border-radius: 60px; border: 2px solid #d3e2ef; font-size: 1rem; outline: none; transition: 0.1s; }
+    .custom-amount input:focus { border-color: #1e3c5c; }
+    .sбп-block { background: #f0f7ff; border-radius: 24px; padding: 1.2rem 1.2rem 1rem; margin-bottom: 1.5rem; border: 1px solid #b9d4ec; }
+    .sбп-block p { margin: 0 0 0.5rem; font-weight: 500; color: #1e3c5c; }
+    .sбп-details { display: flex; align-items: center; gap: 0.8rem; background: white; border-radius: 18px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; font-size: 1rem; flex-wrap: wrap; }
+    .sбп-details span { font-family: monospace; font-weight: 600; background: #eef5fc; padding: 0.2rem 0.6rem; border-radius: 12px; letter-spacing: 0.5px; }
+    .sбп-note { font-size: 0.8rem; color: #2e577a; margin-top: 0.5rem; text-align: center; }
+    .no-requisites { background: #fff6e0; border: 1px solid #e6b12e; border-radius: 20px; padding: 1.2rem; text-align: center; color: #7a5b12; font-size: 0.95rem; margin-bottom: 1.5rem; }
+    .btn-pay { background: #1fa35c; color: white; border: none; font-weight: 700; font-size: 1.1rem; padding: 1rem; border-radius: 60px; width: 100%; cursor: pointer; box-shadow: 0 10px 20px #1fa35c55; transition: 0.1s; }
+    .btn-pay:hover { background: #178a4b; }
+    .hidden { display: none; }
+    .sync-status { font-size: 0.8rem; color: #2e7d32; text-align: center; margin-top: 1rem; }
+    .sync-status.offline { color: #b04b4b; }
+    @media (max-width: 500px) { h1 { font-size: 1.6rem; } .child-name { font-size: 1.5rem; } .amount-btn { flex: 1 0 100%; } }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>🏠 Семейный штаб <span>Максим · Ваня · Дима</span></h1>
+
+  <div class="cards-grid" id="childrenGrid">
+    <!-- Максим -->
+    <div class="child-card" data-child="maxim">
+      <div class="child-header">
+        <div class="avatar">🧑‍🎓</div>
+        <div class="child-name">Максим</div>
+      </div>
+      <div class="task-section">
+        <h3>🍽️ Посуда (по дням)</h3>
+        <ul class="task-list" id="dishes-maxim">
+          <li class="task-item"><span class="task-day">Пн</span> Помыть посуду</li>
+          <li class="task-item"><span class="task-day">Чт</span> Помыть посуду</li>
+          <li class="task-item"><span class="task-day">Вс</span> Помыть посуду</li>
+        </ul>
+      </div>
+      <div class="task-section">
+        <h3>📚 Ежедневно</h3>
+        <ul class="task-list">
+          <li class="task-item">Сделать уроки <span class="badge-daily">каждый день</span></li>
+          <li class="task-item">Почитать книгу <span class="badge-daily">каждый день</span></li>
+        </ul>
+      </div>
+      <div class="task-section">
+        <h3>🧹 Уборка (суббота)</h3>
+        <ul class="task-list">
+          <li class="task-item">Убрать свою комнату</li>
+        </ul>
+      </div>
+      <div class="extra-tasks" id="extra-maxim"></div>
+      <div class="task-counter" id="counter-maxim">0 / 3</div>
+      <button class="btn-add" data-child="maxim">➕ Добавить задание</button>
+      <button class="btn-reward-child" data-child="maxim">💰 Вознаграждение</button>
+    </div>
+
+    <!-- Ваня -->
+    <div class="child-card" data-child="vanya">
+      <div class="child-header">
+        <div class="avatar">🧒</div>
+        <div class="child-name">Ваня</div>
+      </div>
+      <div class="task-section">
+        <h3>🍽️ Посуда (по дням)</h3>
+        <ul class="task-list" id="dishes-vanya">
+          <li class="task-item"><span class="task-day">Вт</span> Помыть посуду</li>
+          <li class="task-item"><span class="task-day">Пт</span> Помыть посуду</li>
+        </ul>
+      </div>
+      <div class="task-section">
+        <h3>📚 Ежедневно</h3>
+        <ul class="task-list">
+          <li class="task-item">Сделать уроки <span class="badge-daily">каждый день</span></li>
+          <li class="task-item">Почитать книгу <span class="badge-daily">каждый день</span></li>
+        </ul>
+      </div>
+      <div class="task-section">
+        <h3>🧹 Уборка (суббота, вместе с Димой)</h3>
+        <ul class="task-list">
+          <li class="task-item">Убрать общую комнату (с Димой)</li>
+        </ul>
+      </div>
+      <div class="extra-tasks" id="extra-vanya"></div>
+      <div class="task-counter" id="counter-vanya">0 / 3</div>
+      <button class="btn-add" data-child="vanya">➕ Добавить задание</button>
+      <button class="btn-reward-child" data-child="vanya">💰 Вознаграждение</button>
+    </div>
+
+    <!-- Дима -->
+    <div class="child-card" data-child="dima">
+      <div class="child-header">
+        <div class="avatar">👦</div>
+        <div class="child-name">Дима</div>
+      </div>
+      <div class="task-section">
+        <h3>🍽️ Посуда (по дням)</h3>
+        <ul class="task-list" id="dishes-dima">
+          <li class="task-item"><span class="task-day">Ср</span> Помыть посуду</li>
+          <li class="task-item"><span class="task-day">Сб</span> Помыть посуду</li>
+        </ul>
+      </div>
+      <div class="task-section">
+        <h3>📚 Ежедневно</h3>
+        <ul class="task-list">
+          <li class="task-item">Сделать уроки <span class="badge-daily">каждый день</span></li>
+          <li class="task-item">Почитать книгу <span class="badge-daily">каждый день</span></li>
+        </ul>
+      </div>
+      <div class="task-section">
+        <h3>🧹 Уборка (суббота, вместе с Ваней)</h3>
+        <ul class="task-list">
+          <li class="task-item">Убрать общую комнату (с Ваней)</li>
+        </ul>
+      </div>
+      <div class="extra-tasks" id="extra-dima"></div>
+      <div class="task-counter" id="counter-dima">0 / 3</div>
+      <button class="btn-add" data-child="dima">➕ Добавить задание</button>
+      <button class="btn-reward-child" data-child="dima">💰 Вознаграждение</button>
+  <div class="sync-status" id="syncStatus">🔄 Подключение к облаку...</div>
+</div>
+
+<!-- Модальное окно вознаграждения -->
+<div class="modal-overlay" id="rewardModal">
+  <div class="modal">
+    <div class="modal-step active" id="stepPayment">
+      <h2>
+        <span class="title-text">Оплата через СБП</span>
+        <button class="modal-close" id="closeModalBtn2">&times;</button>
+      </h2>
+
+      <div class="selected-recipient" id="selectedRecipientBox">
+        <span class="r-avatar">🧑‍🎓</span>
+        <span id="selectedRecipientName">Максим</span>
+      </div>
+
+      <div id="amountBlock">
+        <p>Выберите сумму пожертвования для <strong id="recipientNameInline">Максима</strong>:</p>
+
+        <div class="amount-options" id="amountOptions">
+          <button class="amount-btn" data-amount="100">100 ₽</button>
+          <button class="amount-btn selected" data-amount="300">300 ₽</button>
+          <button class="amount-btn" data-amount="500">500 ₽</button>
+          <button class="amount-btn" data-amount="1000">1000 ₽</button>
+        </div>
+
+        <div class="custom-amount">
+          <input type="number" id="customAmountInput" placeholder="Другая сумма, ₽" min="1">
+        </div>
+      </div>
+
+      <div class="sбп-block" id="requisitesBlock">
+        <p>📱 Реквизиты получателя</p>
+        <div class="sбп-details">
+          <span id="sbpPhone">+7 918 868 87 00</span> — телефон
+        </div>
+        <div class="sбп-details">
+          <span id="sbpCard">2200 7012 1846 7451</span> — карта
+        </div>
+
+        <div class="sбп-note" id="sbpNote">
+          Переведите по телефону или номеру карты
+        </div>
+      </div>
+
+      <div class="no-requisites hidden" id="noRequisitesBlock">
+        💳 Реквизиты для оплаты не указаны.<br>
+        Свяжитесь с родителями, чтобы получить способ перевода.
+      </div>
+
+      <button class="btn-pay" id="payBtn">Перевести через СБП</button>
+    </div>
+  </div>
+</div>
+
+<!-- Подключение Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+  // ============================================
+  // ВАШИ КЛЮЧИ FIREBASE
+  // ============================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDm1fe4UtM3ntBaZ_fLV-QKjhiLC-cQdm4",
+    authDomain: "family-task-for-children.firebaseapp.com",
+    databaseURL: "https://family-task-for-children-default-rtdb.firebaseio.com",
+    projectId: "family-task-for-children",
+    storageBucket: "family-task-for-children.firebasestorage.app",
+    messagingSenderId: "376109164709",
+    appId: "1:376109164709:web:dcce91157d0ab91dbc054c",
+    measurementId: "G-XJXX57Z9TP"
+  };
+  // ============================================
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const syncStatus = document.getElementById('syncStatus');
+  const TASK_LIMIT = 3;
+
+  const extraTasks = { maxim: [], vanya: [], dima: [] };
+  const extraContainers = {
+    maxim: document.getElementById('extra-maxim'),
+    vanya: document.getElementById('extra-vanya'),
+    dima: document.getElementById('extra-dima')
+  };
+  const counters = {
+    maxim: document.getElementById('counter-maxim'),
+    vanya: document.getElementById('counter-vanya'),
+    dima: document.getElementById('counter-dima')
+  };
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function childName(childId) {
+    return childId === 'maxim' ? 'Максима' : childId === 'vanya' ? 'Вани' : 'Димы';
+  }
+
+  function updateCounterAndButtons(childId) {
+    const count = extraTasks[childId].length;
+    const counterEl = counters[childId];
+    if (counterEl) {
+      counterEl.textContent = count + ' / ' + TASK_LIMIT;
+      counterEl.classList.toggle('limit-reached', count >= TASK_LIMIT);
+    }
+    const addBtn = document.querySelector('.btn-add[data-child="' + childId + '"]');
+    if (addBtn) {
+      if (count >= TASK_LIMIT) {
+        addBtn.disabled = true;
+        addBtn.textContent = '🚫 Лимит заданий (' + count + '/' + TASK_LIMIT + ')';
+      } else {
+        addBtn.disabled = false;
+        addBtn.textContent = '➕ Добавить задание';
+      }
+    }
+  }
+
+  function renderExtraTasks(childId) {
+    const container = extraContainers[childId];
+    if (!container) return;
+    container.innerHTML = '';
+    extraTasks[childId].forEach((taskObj) => {
+      const div = document.createElement('div');
+      div.className = 'extra-task';
+      div.innerHTML = `
+        <span>📌 ${escapeHtml(taskObj.text)}</span>
+        <button class="delete-extra" data-child="${childId}" data-id="${taskObj.id}" title="Удалить">✕</button>
+      `;
+      container.appendChild(div);
+    });
+    updateCounterAndButtons(childId);
+  }
+
+  // Подписка на изменения в Firebase
+  ['maxim', 'vanya', 'dima'].forEach(childId => {
+    const childRef = ref(db, 'tasks/' + childId);
+    onValue(childRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        extraTasks[childId] = Object.entries(data).map(([id, value]) => ({
+          id: id,
+          text: value.text
+        }));
+      } else {
+        extraTasks[childId] = [];
+      }
+      renderExtraTasks(childId);
+    }, (error) => {
+      console.error('Ошибка синхронизации:', error);
+      syncStatus.textContent = '❌ Ошибка синхронизации. Проверьте настройки Firebase.';
+      syncStatus.classList.add('offline');
+    });
+  });
+
+  // Статус подключения
+  onValue(ref(db, '.info/connected'), (snapshot) => {
+    if (snapshot.val() === true) {
+      syncStatus.textContent = '✅ Синхронизация активна';
+      syncStatus.classList.remove('offline');
+    } else {
+      syncStatus.textContent = '⚠️ Нет подключения к облаку';
+      syncStatus.classList.add('offline');
+    }
+  });
+
+  function addTaskToChild(childId) {
+    if (extraTasks[childId].length >= TASK_LIMIT) {
+      alert('Для ' + childName(childId) + ' уже добавлено максимум ' + TASK_LIMIT + ' задания(й).\nУдалите одно, чтобы добавить новое.');
+      return;
+    }
+    const taskText = prompt('Введите новое задание для ' + childName(childId) +
+      ' (осталось мест: ' + (TASK_LIMIT - extraTasks[childId].length) + '):');
+    if (!taskText || taskText.trim() === '') return;
+
+    const childRef = ref(db, 'tasks/' + childId);
+    push(childRef, { text: taskText.trim() })
+      .then(() => {
+        syncStatus.textContent = '✅ Задание добавлено и синхронизировано';
+        syncStatus.classList.remove('offline');
+        setTimeout(() => { syncStatus.textContent = '✅ Синхронизация активна'; }, 2000);
+      })
+      .catch((error) => {
+        console.error('Ошибка добавления:', error);
+        alert('Не удалось добавить задание. Проверьте подключение к интернету и правила Firebase.');
+      });
+  }
+
+  document.querySelectorAll('.extra-tasks').forEach(container => {
+    container.addEventListener('click', (e) => {
+      const btn = e.target.closest('.delete-extra');
+      if (!btn) return;
+      const childId = btn.dataset.child;
+      const taskId = btn.dataset.id;
+      if (!childId || !taskId) return;
+
+      const taskRef = ref(db, 'tasks/' + childId + '/' + taskId);
+      remove(taskRef)
+        .then(() => {
+          syncStatus.textContent = '🗑️ Задание удалено';
+          setTimeout(() => { syncStatus.textContent = '✅ Синхронизация активна'; }, 2000);
+        })
+        .catch((error) => {
+          console.error('Ошибка удаления:', error);
+          alert('Не удалось удалить задание.');
+        });
+    });
+  });
+
+  document.querySelectorAll('.btn-add').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const childId = btn.dataset.child;
+      if (childId) addTaskToChild(childId);
+    });
+  });
+
+  document.getElementById('addGlobalTaskBtn').addEventListener('click', () => {
+    const choice = prompt('Для кого добавить задание? Напишите имя: Максим, Ваня или Дима');
+    if (!choice) return;
+    const lower = choice.trim().toLowerCase();
+    let childId = null;
+    if (lower === 'максим') childId = 'maxim';
+    else if (lower === 'ваня') childId = 'vanya';
+    else if (lower === 'дима') childId = 'dima';
+    else {
+      alert('Неизвестное имя. Введите Максим, Ваня или Дима.');
+      return;
+    }
+    addTaskToChild(childId);
+  });
+
+  // ----- МОДАЛКА ВОЗНАГРАЖДЕНИЯ -----
+  const modal = document.getElementById('rewardModal');
+  const closeModalBtn2 = document.getElementById('closeModalBtn2');
+  const selectedRecipientBox = document.getElementById('selectedRecipientBox');
+  const selectedRecipientName = document.getElementById('selectedRecipientName');
+  const recipientNameInline = document.getElementById('recipientNameInline');
+  const amountBlock = document.getElementById('amountBlock');
+  const requisitesBlock = document.getElementById('requisitesBlock');
+  const noRequisitesBlock = document.getElementById('noRequisitesBlock');
+  const amountBtns = document.querySelectorAll('.amount-btn');
+  const customInput = document.getElementById('customAmountInput');
+  const payBtn = document.getElementById('payBtn');
+
+  const recipientsData = {
+    maxim: { name: 'Максим', genitive: 'Максима', avatar: '🧑‍🎓', phone: '+7 918 868 87 00', card: '2200 7012 1846 7451', hasRequisites: true },
+    vanya: { name: 'Ваня', genitive: 'Вани', avatar: '🧒', hasRequisites: false },
+    dima: { name: 'Дима', genitive: 'Димы', avatar: '👦', hasRequisites: false }
+  };
+
+  let currentRecipient = null;
+  let selectedAmount = 300;
+
+  function resetAmountSelection() {
+    amountBtns.forEach(b => b.classList.remove('selected'));
+    const defaultBtn = Array.from(amountBtns).find(b => b.dataset.amount === '300');
+    if (defaultBtn) defaultBtn.classList.add('selected');
+    selectedAmount = 300;
+  }
+
+  function closeModal() { modal.classList.remove('active'); }
+  closeModalBtn2.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  function openRewardFor(childId) {
+    const data = recipientsData[childId];
+    if (!data) return;
+    currentRecipient = childId;
+    selectedRecipientBox.querySelector('.r-avatar').textContent = data.avatar;
+    selectedRecipientName.textContent = data.name;
+    recipientNameInline.textContent = data.genitive;
+
+    if (data.hasRequisites) {
+      amountBlock.classList.remove('hidden');
+      requisitesBlock.classList.remove('hidden');
+      noRequisitesBlock.classList.add('hidden');
+      payBtn.classList.remove('hidden');
+      document.getElementById('sbpPhone').textContent = data.phone;
+      document.getElementById('sbpCard').textContent = data.card;
+      document.getElementById('sbpNote').textContent = 'Переведите по телефону или номеру карты (получатель: ' + data.name + ')';
+      resetAmountSelection();
+      customInput.value = '';
+    } else {
+      amountBlock.classList.add('hidden');
+      requisitesBlock.classList.add('hidden');
+      noRequisitesBlock.classList.remove('hidden');
+      payBtn.classList.add('hidden');
+    }
+    modal.classList.add('active');
+  }
+
+  document.querySelectorAll('.btn-reward-child').forEach(btn => {
+    btn.addEventListener('click', () => openRewardFor(btn.dataset.child));
+  });
+
+  amountBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      amountBtns.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedAmount = parseInt(btn.dataset.amount, 10);
+      customInput.value = '';
+    });
+  });
+
+  customInput.addEventListener('input', () => {
+    if (customInput.value.trim() !== '') {
+      amountBtns.forEach(b => b.classList.remove('selected'));
+    } else {
+      resetAmountSelection();
+    }
+  });
+
+  payBtn.addEventListener('click', () => {
+    if (!currentRecipient) {
+      alert('Сначала выберите получателя.');
+      return;
+    }
+    const data = recipientsData[currentRecipient];
+    let finalAmount = selectedAmount;
+    const customVal = customInput.value.trim();
+    if (customVal !== '') {
+      const parsed = Number(customVal);
+      if (isNaN(parsed) || parsed <= 0) {
+        alert('Пожалуйста, введите корректную сумму.');
+        return;
+      }
+      finalAmount = parsed;
+    }
+    alert(
+      '✅ Переход к оплате\n\n' +
+      'Получатель: ' + data.name + '\n' +
+      'Сумма: ' + finalAmount + ' ₽\n' +
+      'Телефон: ' + data.phone + '\n' +
+      'Карта: ' + data.card + '\n\n' +
+      'Спасибо за поддержку!'
+    );
+    closeModal();
+  });
+</script>
+</body>
+</html>

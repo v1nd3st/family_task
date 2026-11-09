@@ -177,7 +177,7 @@
   <div class="modal">
     <div class="modal-step active" id="stepPayment">
       <h2>
-        <span class="title-text">Оплата через СБП</span>
+        <span class="title-text">Вознаграждение</span>
         <button class="modal-close" id="closeModalBtn2">&times;</button>
       </h2>
 
@@ -186,6 +186,7 @@
         <span id="selectedRecipientName">Максим</span>
       </div>
 
+      <!-- Блок выбора суммы (скрывается для Максима) -->
       <div id="amountBlock">
         <p>Выберите сумму пожертвования для <strong id="recipientNameInline">Максима</strong>:</p>
 
@@ -201,6 +202,7 @@
         </div>
       </div>
 
+      <!-- Блок реквизитов (показывается для Максима) -->
       <div class="sбп-block" id="requisitesBlock">
         <p>📱 Реквизиты получателя</p>
         <div class="sбп-details">
@@ -215,11 +217,13 @@
         </div>
       </div>
 
+      <!-- Блок «нет реквизитов» (для Вани и Димы) -->
       <div class="no-requisites hidden" id="noRequisitesBlock">
         💳 Реквизиты для оплаты не указаны.<br>
         Свяжитесь с родителями, чтобы получить способ перевода.
       </div>
 
+      <!-- Кнопка перевода (скрывается для Максима) -->
       <button class="btn-pay" id="payBtn">Перевести через СБП</button>
     </div>
   </div>
@@ -291,7 +295,7 @@
     syncStatus.classList.add('offline');
   }
 
-  // 2. Интерфейс (кнопки работают сразу)
+  // 2. Интерфейс
   const extraContainers = {
     maxim: document.getElementById('extra-maxim'),
     vanya: document.getElementById('extra-vanya'),
@@ -375,7 +379,6 @@
       });
   }
 
-  // Привязка кнопок добавления
   document.querySelectorAll('.btn-add').forEach(btn => {
     btn.addEventListener('click', () => {
       const childId = btn.dataset.child;
@@ -383,7 +386,6 @@
     });
   });
 
-  // Привязка кнопок удаления
   document.querySelectorAll('.extra-tasks').forEach(container => {
     container.addEventListener('click', (e) => {
       const btn = e.target.closest('.delete-extra');
@@ -411,28 +413,20 @@
   const selectedRecipientBox = document.getElementById('selectedRecipientBox');
   const selectedRecipientName = document.getElementById('selectedRecipientName');
   const recipientNameInline = document.getElementById('recipientNameInline');
+  
   const amountBlock = document.getElementById('amountBlock');
   const requisitesBlock = document.getElementById('requisitesBlock');
   const noRequisitesBlock = document.getElementById('noRequisitesBlock');
-  const amountBtns = document.querySelectorAll('.amount-btn');
-  const customInput = document.getElementById('customAmountInput');
   const payBtn = document.getElementById('payBtn');
 
+  const amountBtns = document.querySelectorAll('.amount-btn');
+  const customInput = document.getElementById('customAmountInput');
+
   const recipientsData = {
-    maxim: { name: 'Максим', genitive: 'Максима', avatar: '🧑‍🎓', phone: '+7 918 868 87 00', card: '2200 7012 1846 7451', hasRequisites: true },
-    vanya: { name: 'Ваня', genitive: 'Вани', avatar: '🧒', hasRequisites: false },
-    dima: { name: 'Дима', genitive: 'Димы', avatar: '👦', hasRequisites: false }
+    maxim: { name: 'Максим', avatar: '🧑‍🎓', phone: '+7 918 868 87 00', card: '2200 7012 1846 7451', mode: 'requisites_only' },
+    vanya: { name: 'Ваня', avatar: '🧒', mode: 'no_requisites' },
+    dima: { name: 'Дима', avatar: '👦', mode: 'no_requisites' }
   };
-
-  let currentRecipient = null;
-  let selectedAmount = 300;
-
-  function resetAmountSelection() {
-    amountBtns.forEach(b => b.classList.remove('selected'));
-    const defaultBtn = Array.from(amountBtns).find(b => b.dataset.amount === '300');
-    if (defaultBtn) defaultBtn.classList.add('selected');
-    selectedAmount = 300;
-  }
 
   function closeModal() { modal.classList.remove('active'); }
   closeModalBtn2.addEventListener('click', closeModal);
@@ -441,78 +435,35 @@
   function openRewardFor(childId) {
     const data = recipientsData[childId];
     if (!data) return;
-    currentRecipient = childId;
+
     selectedRecipientBox.querySelector('.r-avatar').textContent = data.avatar;
     selectedRecipientName.textContent = data.name;
-    recipientNameInline.textContent = data.genitive;
 
-    if (data.hasRequisites) {
-      amountBlock.classList.remove('hidden');
-      requisitesBlock.classList.remove('hidden');
+    if (data.mode === 'requisites_only') {
+      // Максим: только реквизиты, без выбора суммы и кнопки перевода
+      amountBlock.classList.add('hidden');
+      payBtn.classList.add('hidden');
       noRequisitesBlock.classList.add('hidden');
-      payBtn.classList.remove('hidden');
+      
+      requisitesBlock.classList.remove('hidden');
       document.getElementById('sbpPhone').textContent = data.phone;
       document.getElementById('sbpCard').textContent = data.card;
       document.getElementById('sbpNote').textContent = 'Переведите по телефону или номеру карты (получатель: ' + data.name + ')';
-      resetAmountSelection();
-      customInput.value = '';
-    } else {
+      
+    } else if (data.mode === 'no_requisites') {
+      // Ваня и Дима: нет реквизитов
       amountBlock.classList.add('hidden');
-      requisitesBlock.classList.add('hidden');
-      noRequisitesBlock.classList.remove('hidden');
       payBtn.classList.add('hidden');
+      requisitesBlock.classList.add('hidden');
+      
+      noRequisitesBlock.classList.remove('hidden');
     }
+    
     modal.classList.add('active');
   }
 
-  // Привязка кнопок вознаграждения
   document.querySelectorAll('.btn-reward-child').forEach(btn => {
     btn.addEventListener('click', () => openRewardFor(btn.dataset.child));
-  });
-
-  // Обработчики внутри модалки
-  amountBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      amountBtns.forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedAmount = parseInt(btn.dataset.amount, 10);
-      customInput.value = '';
-    });
-  });
-
-  customInput.addEventListener('input', () => {
-    if (customInput.value.trim() !== '') {
-      amountBtns.forEach(b => b.classList.remove('selected'));
-    } else {
-      resetAmountSelection();
-    }
-  });
-
-  payBtn.addEventListener('click', () => {
-    if (!currentRecipient) {
-      alert('Сначала выберите получателя.');
-      return;
-    }
-    const data = recipientsData[currentRecipient];
-    let finalAmount = selectedAmount;
-    const customVal = customInput.value.trim();
-    if (customVal !== '') {
-      const parsed = Number(customVal);
-      if (isNaN(parsed) || parsed <= 0) {
-        alert('Пожалуйста, введите корректную сумму.');
-        return;
-      }
-      finalAmount = parsed;
-    }
-    alert(
-      '✅ Переход к оплате\n\n' +
-      'Получатель: ' + data.name + '\n' +
-      'Сумма: ' + finalAmount + ' ₽\n' +
-      'Телефон: ' + data.phone + '\n' +
-      'Карта: ' + data.card + '\n\n' +
-      'Спасибо за поддержку!'
-    );
-    closeModal();
   });
 </script>
 </body>

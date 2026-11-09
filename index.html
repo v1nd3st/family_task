@@ -185,6 +185,23 @@
         <span class="r-avatar">🧑‍🎓</span>
         <span id="selectedRecipientName">Максим</span>
       </div>
+
+      <!-- Блок выбора суммы (скрыт по умолчанию) -->
+      <div id="amountBlock" style="display: none;">
+        <p>Выберите сумму пожертвования для <strong id="recipientNameInline">Максима</strong>:</p>
+
+        <div class="amount-options" id="amountOptions">
+          <button class="amount-btn" data-amount="100">100 ₽</button>
+          <button class="amount-btn selected" data-amount="300">300 ₽</button>
+          <button class="amount-btn" data-amount="500">500 ₽</button>
+          <button class="amount-btn" data-amount="1000">1000 ₽</button>
+        </div>
+
+        <div class="custom-amount">
+          <input type="number" id="customAmountInput" placeholder="Другая сумма, ₽" min="1">
+        </div>
+      </div>
+
       <!-- Блок реквизитов (скрыт по умолчанию) -->
       <div class="sбп-block" id="requisitesBlock" style="display: none;">
         <p>📱 Реквизиты получателя</p>

@@ -238,8 +238,10 @@
   import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
   const syncStatus = document.getElementById('syncStatus');
+  let db = null;
+  let extraTasks = { maxim: [], vanya: [], dima: [] };
 
-  // Сначала привязываем интерфейс (чтобы кнопки работали даже без интернета)
+  // Сначала инициализируем интерфейс, чтобы кнопки работали всегда
   initInterface();
 
   // ============================================
@@ -256,9 +258,6 @@
     measurementId: "G-XJXX57Z9TP"
   };
   // ============================================
-
-  let db = null;
-  let extraTasks = { maxim: [], vanya: [], dima: [] };
 
   try {
     const app = initializeApp(firebaseConfig);
@@ -277,7 +276,7 @@
         } else {
           extraTasks[childId] = [];
         }
-        renderExtraTasks(childId);
+        if (window.renderExtraTasks) window.renderExtraTasks(childId);
       }, (error) => {
         console.error('Ошибка синхронизации:', error);
         syncStatus.textContent = '❌ Ошибка синхронизации данных';
@@ -298,7 +297,7 @@
 
   } catch (error) {
     console.error("Ошибка Firebase:", error);
-    syncStatus.textContent = '❌ Ошибка подключения к Firebase. Проверьте консоль.';
+    syncStatus.textContent = '❌ Ошибка подключения к Firebase.';
     syncStatus.classList.add('offline');
   }
 
@@ -345,6 +344,7 @@
       }
     }
 
+    // Сохраняем функцию в window, чтобы она была доступна из блока Firebase
     window.renderExtraTasks = function(childId) {
       const container = extraContainers[childId];
       if (!container) return;
@@ -493,6 +493,7 @@
       modal.classList.add('active');
     }
 
+    // ВАЖНО: Привязка кликов к кнопкам вознаграждения
     document.querySelectorAll('.btn-reward-child').forEach(btn => {
       btn.addEventListener('click', () => openRewardFor(btn.dataset.child));
     });
